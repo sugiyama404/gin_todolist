@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+function docker_go_test() {
+  local cwd="$1"
+  cd "${cwd}"
+  docker compose exec apserver go test ./cmd/test/...
+}
+
+function main() {
+  local cwd
+  cwd="$(cd "$(dirname "$0")/.." && pwd)"
+  docker_go_test "${cwd}"
+
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+fi

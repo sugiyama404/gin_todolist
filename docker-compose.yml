@@ -1,0 +1,46 @@
+version: "3"
+services:
+  apserver:
+    build:
+      context: ./apserver
+      target: development
+    container_name: "gin_todo"
+    #command: sh -c "sleep 3 && go run cmd/main.go"
+    tty: true
+    volumes:
+      - ./apserver/app:/app
+    ports:
+      - "8080:8080"
+  webserver:
+    build:
+      context: ./webserver
+      target: development
+    container_name: next13
+    tty: true
+    volumes:
+      - ./webserver/myapp:/usr/src/app/myapp
+      - /usr/src/app/myapp/node_modules
+    #command: npm run dev
+    environment:
+      - PORT=80
+    ports:
+      - "3000:3000"
+      - "80:80"
+  dbserver:
+    build: ./dbserver
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: todoproject
+      MYSQL_USER: goMySql1
+      MYSQL_PASSWORD: goMySql1
+      TZ: 'Asia/Tokyo'
+    command: mysqld
+    volumes:
+      - ./dbserver/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./dbserver/init/:/docker-entrypoint-initdb.d/
+    ports:
+      - 3306:3306
+    cap_add:
+      - SYS_NICE
